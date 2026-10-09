@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 type Task = {
   id: number;
   title: string;
@@ -50,7 +53,7 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/tasks", {
+      const response = await fetch(`${API_URL}/tasks`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -75,7 +78,7 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/focus", {
+      const response = await fetch(`${API_URL}/focus`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,7 +88,11 @@ export default function DashboardPage() {
 
       if (!response.ok) return;
 
-      if (data.active && data.focus && data.remainingSeconds) {
+      if (
+        data.active &&
+        data.focus &&
+        data.remainingSeconds !== undefined
+      ) {
         setFocusTaskId(data.focus.taskId);
         setRemainingSeconds(data.remainingSeconds);
       } else {
@@ -102,7 +109,7 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/focus/history", {
+      const response = await fetch(`${API_URL}/focus/history`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -128,7 +135,7 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/tasks", {
+      const response = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,15 +165,12 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/tasks/${taskId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
 
@@ -199,17 +203,14 @@ export default function DashboardPage() {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/tasks/${taskId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
       const data = await response.json();
 
@@ -234,17 +235,14 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/tasks/${taskId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ priority: newPriority }),
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ priority: newPriority }),
+      });
 
       const data = await response.json();
 
@@ -277,19 +275,16 @@ export default function DashboardPage() {
     if (!token || editingTitle.trim() === "") return;
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/tasks/${taskId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: editingTitle,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: editingTitle,
+        }),
+      });
 
       const data = await response.json();
 
@@ -315,7 +310,7 @@ export default function DashboardPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/focus/start/${taskId}`,
+        `${API_URL}/focus/start/${taskId}`,
         {
           method: "POST",
           headers: {
@@ -347,7 +342,7 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:5000/focus", {
+      const response = await fetch(`${API_URL}/focus`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -515,7 +510,9 @@ export default function DashboardPage() {
           </form>
 
           {message && (
-            <p className="mt-3 text-sm text-slate-600">{message}</p>
+            <p className="mt-3 text-sm text-slate-600">
+              {message}
+            </p>
           )}
         </div>
 
@@ -652,6 +649,7 @@ export default function DashboardPage() {
                     <p className="font-medium">
                       {session.task_title}
                     </p>
+
                     <p className="text-sm text-slate-500">
                       {new Date(session.started_at).toLocaleString("tr-TR")}
                     </p>

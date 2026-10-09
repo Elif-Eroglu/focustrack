@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -14,7 +15,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,9 +36,7 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      setMessage("Giriş başarılı");
-
-      router.push("/dashboard");
+      window.location.replace("/dashboard");
     } catch (error) {
       console.error(error);
       setMessage("Sunucuya bağlanılamadı");
@@ -45,50 +44,68 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          FocusTrack Giriş
+    <main className="min-h-screen flex items-center justify-center bg-slate-100 text-slate-900">
+      <div className="w-full max-w-md bg-white border border-slate-200 p-8 rounded-2xl shadow-sm">
+        <h1 className="text-3xl font-bold mb-2 text-center">
+          FocusTrack
         </h1>
+
+        <p className="text-slate-500 text-center mb-6">
+          Hesabına giriş yap
+        </p>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block mb-1">E-posta</label>
+            <label className="block mb-1 font-medium">
+              E-posta
+            </label>
 
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border p-2 rounded"
+              className="w-full border border-slate-300 px-4 py-3 rounded-xl"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1">Şifre</label>
+            <label className="block mb-1 font-medium">
+              Şifre
+            </label>
 
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border p-2 rounded"
+              className="w-full border border-slate-300 px-4 py-3 rounded-xl"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-black text-white p-2 rounded"
+            className="w-full bg-slate-900 text-white py-3 rounded-xl font-medium"
           >
             Giriş Yap
           </button>
         </form>
 
         {message && (
-          <p className="mt-4 text-center">
+          <p className="mt-4 text-center text-sm text-slate-600">
             {message}
           </p>
         )}
+
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Hesabın yok mu?{" "}
+          <Link
+            href="/register"
+            className="font-semibold text-slate-900 hover:underline"
+          >
+            Kayıt Ol
+          </Link>
+        </p>
       </div>
     </main>
   );
