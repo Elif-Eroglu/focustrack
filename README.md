@@ -27,9 +27,9 @@ Proje; frontend, backend, veritabanı, authentication, Redis, Docker, Git/GitHub
 
 ### Backend
 
-- Node.js
-- Express.js
-- JWT
+- Python
+- FastAPI
+- JWT (PyJWT)
 - bcrypt
 
 ### Veri Katmanı
@@ -51,11 +51,12 @@ Proje; frontend, backend, veritabanı, authentication, Redis, Docker, Git/GitHub
 ```text
 focustrack/
 ├── backend/
-│   ├── server.js
-│   ├── db.js
-│   ├── redis.js
+│   ├── server.py
+│   ├── db.py
+│   ├── redis_client.py
 │   ├── init.sql
-│   ├── init-db.js
+│   ├── init_db.py
+│   ├── requirements.txt
 │   └── Dockerfile
 │
 ├── frontend/
@@ -80,7 +81,7 @@ flowchart TD
 
     F[Next.js Frontend<br/>Vercel]
 
-    B[Node.js + Express Backend<br/>Railway]
+    B[Python + FastAPI Backend<br/>Railway]
 
     P[(PostgreSQL<br/>Railway)]
     R[(Redis<br/>Railway)]
@@ -174,8 +175,7 @@ focus_sessions
 ### Gereksinimler
 
 - Git
-- Node.js
-- npm
+- Node.js ve npm (frontend için)
 - Docker Desktop
 
 Projeyi klonlayın:
@@ -250,7 +250,7 @@ Production ortamındaki servis dağılımı:
 | Servis | Platform |
 |---|---|
 | Next.js Frontend | Vercel |
-| Node.js / Express Backend | Railway |
+| Python / FastAPI Backend | Railway |
 | PostgreSQL | Railway |
 | Redis | Railway |
 
@@ -261,7 +261,7 @@ Kullanıcı
    ↓
 Vercel / Next.js
    ↓
-Railway / Express API
+Railway / FastAPI
    ↓
 PostgreSQL + Redis
 ```
@@ -326,15 +326,15 @@ dosyasında tanımlanmıştır.
 Bu SQL dosyasını çalıştırmak için:
 
 ```text
-backend/init-db.js
+backend/init_db.py
 ```
 
-scripti kullanılır.
+scripti kullanılır (Python).
 
 Railway üzerinde Pre-deploy Command:
 
 ```bash
-node init-db.js
+python init_db.py
 ```
 
 olarak yapılandırılmıştır.

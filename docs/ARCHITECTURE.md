@@ -16,7 +16,7 @@ flowchart TD
 
     F[Next.js Frontend<br/>Vercel]
 
-    B[Node.js + Express API<br/>Railway]
+    B[Python + FastAPI API<br/>Railway]
 
     P[(PostgreSQL<br/>Railway)]
     R[(Redis<br/>Railway)]
@@ -52,7 +52,7 @@ Veri erişimi ve iş mantığı backend üzerinden yönetilir.
 | Servis | Teknoloji | Production Ortamı | Sorumluluk |
 |---|---|---|---|
 | Frontend | Next.js / TypeScript | Vercel | Kullanıcı arayüzü |
-| Backend | Node.js / Express | Railway | REST API ve iş mantığı |
+| Backend | Python / FastAPI | Railway | REST API ve iş mantığı |
 | Database | PostgreSQL | Railway | Kalıcı veriler |
 | Temporary State | Redis | Railway | Aktif focus oturumu |
 | Repository | Git / GitHub | GitHub | Kaynak kod ve versiyon kontrolü |
@@ -109,12 +109,12 @@ NEXT_PUBLIC_API_URL=https://<railway-backend-domain>
 
 ## 4. Backend Katmanı
 
-Backend Node.js ve Express kullanılarak geliştirilmiştir.
+Backend Python ve FastAPI kullanılarak geliştirilmiştir.
 
 Ana backend dosyası:
 
 ```text
-backend/server.js
+backend/server.py
 ```
 
 Backend'in temel sorumlulukları:
@@ -154,7 +154,7 @@ Kullanıcının yaptığı işlemler frontend tarafından backend API'ye gönder
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Next.js Frontend
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant D as PostgreSQL / Redis
 
     U->>F: Kullanıcı işlemi
@@ -177,7 +177,7 @@ Kullanıcı register ekranında isim, e-posta ve şifre bilgilerini girer.
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Next.js Register
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant P as PostgreSQL
 
     U->>F: İsim + E-posta + Şifre
@@ -211,7 +211,7 @@ Login sırasında kullanıcı e-posta ve şifresini frontend üzerinden gönderi
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Next.js Frontend
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant P as PostgreSQL
 
     U->>F: E-posta + Şifre
@@ -239,7 +239,7 @@ Authorization: Bearer <JWT>
 
 ---
 
-## 8. Authentication Middleware
+## 8. Authentication Kontrolü
 
 Korunan endpoint'lerde backend doğrudan işlemi çalıştırmaz.
 
@@ -250,7 +250,7 @@ Frontend Request
       ↓
 Authorization Header
       ↓
-authenticateToken
+authenticate_token
       ↓
 JWT geçerli mi?
       ↓
@@ -262,10 +262,10 @@ Endpoint çalışır
 Bu işlem:
 
 ```text
-backend/server.js
+backend/server.py
 ```
 
-içerisindeki authentication middleware tarafından gerçekleştirilir.
+içerisindeki `authenticate_token` fonksiyonu tarafından gerçekleştirilir. FastAPI'de bu fonksiyon korunan endpoint'lere `Depends(authenticate_token)` ile bağlanır.
 
 Bu sayede backend isteği yapan kullanıcının kim olduğunu bilir.
 
@@ -299,7 +299,7 @@ API karşılıkları:
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Dashboard
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant P as PostgreSQL
 
     U->>F: Görev Ekle
@@ -332,15 +332,15 @@ PostgreSQL uygulamanın kalıcı veri katmanıdır.
 Bağlantı:
 
 ```text
-backend/db.js
+backend/db.py
 ```
 
 dosyasında oluşturulur.
 
-Node.js tarafında PostgreSQL bağlantısı için:
+Python tarafında PostgreSQL bağlantısı için:
 
 ```text
-pg
+psycopg (psycopg_pool)
 ```
 
 paketi kullanılmaktadır.
@@ -452,7 +452,7 @@ Redis aktif focus oturumunun geçici state'ini tutmak için kullanılır.
 Redis bağlantısı:
 
 ```text
-backend/redis.js
+backend/redis_client.py
 ```
 
 dosyasında oluşturulur.
@@ -501,7 +501,7 @@ Kullanıcı dashboard üzerinde bir task için "Odaklan" butonuna bastığında:
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Dashboard
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant P as PostgreSQL
     participant R as Redis
 
@@ -545,7 +545,7 @@ Kullanıcı sayfayı yenilediğinde:
 ```mermaid
 sequenceDiagram
     participant F as Dashboard
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant R as Redis
 
     F->>B: GET /focus
@@ -569,7 +569,7 @@ Kullanıcı aktif focus oturumunu durdurduğunda:
 sequenceDiagram
     participant U as Kullanıcı
     participant F as Dashboard
-    participant B as Express Backend
+    participant B as FastAPI Backend
     participant R as Redis
     participant P as PostgreSQL
 
@@ -649,7 +649,7 @@ localhost:3000
 Backend:
 
 ```text
-Node.js / Express
+Python / FastAPI
 localhost:5000
 ```
 
@@ -770,7 +770,7 @@ flowchart TD
 
     V[Vercel<br/>Next.js Frontend]
 
-    B[Railway<br/>Express Backend]
+    B[Railway<br/>FastAPI Backend]
 
     P[(Railway PostgreSQL)]
     R[(Railway Redis)]
@@ -855,7 +855,7 @@ dosyası kullanılır.
 Bu SQL dosyasını çalıştıran script:
 
 ```text
-backend/init-db.js
+backend/init_db.py
 ```
 
 dosyasıdır.
@@ -863,7 +863,7 @@ dosyasıdır.
 Railway üzerinde Pre-deploy Command:
 
 ```bash
-node init-db.js
+python init_db.py
 ```
 
 olarak ayarlanmıştır.
@@ -873,7 +873,7 @@ Akış:
 ```text
 Deployment başlar
       ↓
-node init-db.js
+python init_db.py
       ↓
 init.sql okunur
       ↓
@@ -1001,7 +1001,7 @@ FocusTrack mimarisinin temel prensibi servislerin sorumluluklarının ayrılmas�
 Next.js
 → Kullanıcı arayüzü
 
-Express
+FastAPI
 → API ve iş mantığı
 
 PostgreSQL
@@ -1032,7 +1032,7 @@ Vercel / Next.js
    ↓
 REST API + JWT
    ↓
-Railway / Express
+Railway / FastAPI
    ↓
    ├── PostgreSQL
    └── Redis
